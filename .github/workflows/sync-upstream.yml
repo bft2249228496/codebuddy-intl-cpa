@@ -1,0 +1,28 @@
+name: Sync upstream
+
+on:
+  schedule:
+    - cron: '30 1 * * *' # 09:30 Asia/Shanghai
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-upstream
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out fork main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Add upstream
+        run: git remote add upstream https://github.com/zidanefaqih/codebuddy-intl-cpa.git
+      - name: Merge upstream and sync tags
+        run: bash scripts/sync-upstream.sh
